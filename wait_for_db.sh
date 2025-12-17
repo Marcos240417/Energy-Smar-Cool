@@ -1,18 +1,31 @@
 #!/bin/sh
+set -e
 
-# Espera o Postgres
-until nc -z -v -w30 db_postgres 5432
-do
-  echo "Waiting for Postgres..."
+# ================================
+# WAIT FOR POSTGRES
+# ================================
+echo "⏳ Aguardando Postgres (db_postgres:5432)..."
+
+until nc -z db_postgres 5432; do
   sleep 1
 done
 
-# Espera o Mongo
-until nc -z -v -w30 mongo 27017
-do
-  echo "Waiting for Mongo..."
+echo "✅ Postgres disponível!"
+
+
+# ================================
+# WAIT FOR MONGODB
+# ================================
+echo "⏳ Aguardando MongoDB (mongo:27017)..."
+
+until nc -z mongo 27017; do
   sleep 1
 done
 
-echo "Databases are up!"
+echo "✅ MongoDB disponível!"
+
+
+# ================================
+# EXECUTA COMANDO PRINCIPAL
+# ================================
 exec "$@"

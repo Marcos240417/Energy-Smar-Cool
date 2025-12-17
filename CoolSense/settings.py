@@ -4,76 +4,92 @@ Django settings for CoolSense project.
 
 from pathlib import Path
 import os
-from pymongo import MongoClient
 
+# ================================
+# BASE DIR
+# ================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ================================
-# SECRET KEY
+# SECURITY
 # ================================
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-key")
 
+DEBUG = os.environ.get("DEBUG", "1") == "1"
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "web",  # nome do serviço no Docker
+]
+
 
 # ================================
-# DEBUG
-# ================================
-DEBUG = True
-ALLOWED_HOSTS = []
-
-
-# ================================
-# APPS
+# APPLICATIONS
 # ================================
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'core',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    "rest_framework",
+    "core",
 ]
+
+
+# ================================
+# AUTH USER
+# ================================
+AUTH_USER_MODEL = "core.User"
 
 
 # ================================
 # MIDDLEWARE
 # ================================
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 
-ROOT_URLCONF = 'CoolSense.urls'
+# ================================
+# URLS / WSGI
+# ================================
+ROOT_URLCONF = "CoolSense.urls"
+
+WSGI_APPLICATION = "CoolSense.wsgi.application"
 
 
+# ================================
+# TEMPLATES
+# ================================
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
 
-WSGI_APPLICATION = 'CoolSense.wsgi.application'
-
-
 # ================================
-# DATABASES (apenas Postgres)
+# DATABASE (POSTGRES)
 # ================================
 DATABASES = {
     "default": {
@@ -88,38 +104,63 @@ DATABASES = {
 
 
 # ================================
-# MONGO (PyMongo)
+# MONGO (APENAS URI)
 # ================================
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongo:27017/coolsense")
-
-mongo_client = MongoClient(MONGO_URI)
-mongo_db = mongo_client["coolsense"]
+MONGO_URI = os.environ.get(
+    "MONGO_URI",
+    "mongodb://mongo:27017/coolsense"
+)
 
 
 # ================================
-# PASSWORDS
+# PASSWORD VALIDATION
 # ================================
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+    },
 ]
 
 
 # ================================
-# I18N
+# INTERNATIONALIZATION
 # ================================
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = "pt-br"
+TIME_ZONE = "America/Recife"
+
 USE_I18N = True
 USE_TZ = True
 
 
 # ================================
-# STATIC
+# STATIC FILES
 # ================================
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
 
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# ================================
+# DEFAULT PRIMARY KEY
+# ================================
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# ================================
+# DJANGO REST FRAMEWORK (BÁSICO)
+# ================================
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
