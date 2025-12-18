@@ -9,9 +9,7 @@ from django.contrib.auth.models import AbstractUser
 #http://localhost:8000/admin
 #http://localhost:8000/api/users/
 
-# ================================
-# LOJA
-# ================================
+
 class Loja(models.Model):
     nome = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=18, unique=True)
@@ -27,9 +25,7 @@ class Loja(models.Model):
         ordering = ["nome"]
 
 
-# ================================
-# USUÁRIO
-# ================================
+
 class User(AbstractUser):
     ADMIN = "ADMIN"
     TECNICO = "TECNICO"
@@ -65,9 +61,7 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
-# ================================
-# Aparelhos
-# ================================
+
 
 class Aparelho(models.Model):
     AR_CONDICIONADO = "AR"

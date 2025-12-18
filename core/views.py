@@ -7,9 +7,6 @@ from .serializers import AparelhoSerializer
 from .permissions import IsAdminOrTecnico
 from rest_framework.serializers import ModelSerializer
 
-# ======================================================
-# PERMISSÕES (RBAC)
-# ======================================================
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
@@ -34,9 +31,7 @@ class IsCliente(BasePermission):
             and request.user.role == "CLIENTE"
         )
 
-# ======================================================
-# SERIALIZERS
-# ======================================================
+
 
 User = get_user_model()
 
@@ -60,9 +55,7 @@ class LojaSerializer(ModelSerializer):
         model = Loja
         fields = "__all__"
 
-# ======================================================
-# VIEWSETS
-# ======================================================
+
 
 class UserViewSet(ModelViewSet):
     """
@@ -104,9 +97,7 @@ class LojaViewSet(ModelViewSet):
 
         return Loja.objects.none()
 
-# ======================================================
-# REGRA DE NEGÓCIO
-# ======================================================
+
 
 def pode_ver_loja(user, loja_id) -> bool:
     if user.role == "ADMIN":
@@ -120,9 +111,7 @@ def pode_ver_loja(user, loja_id) -> bool:
 
     return False
 
-# ======================================================
-# APARELHOS (CRUD PRONTO)
-# ======================================================
+
 
 class AparelhoViewSet(ModelViewSet):
     """
