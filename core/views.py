@@ -58,23 +58,14 @@ class LojaSerializer(ModelSerializer):
 
 
 class UserViewSet(ModelViewSet):
-    """
-    CRUD de usuários.
-    Acesso exclusivo do ADMIN.
-    """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
 
 
 class LojaViewSet(ModelViewSet):
-    """
-    CRUD de lojas.
 
-    ADMIN   → acesso total
-    TECNICO → leitura de lojas ativas
-    CLIENTE → apenas sua própria loja
-    """
     queryset = Loja.objects.all()
     serializer_class = LojaSerializer
 
@@ -114,14 +105,8 @@ def pode_ver_loja(user, loja_id) -> bool:
 
 
 class AparelhoViewSet(ModelViewSet):
-    """
-    CRUD de aparelhos.
 
-    ADMIN   → acesso total
-    TECNICO → acesso total
-    CLIENTE → leitura apenas da própria loja
-    """
-    queryset = Aparelho.objects.all()   # 🔥 ESSENCIAL
+    queryset = Aparelho.objects.all()
     serializer_class = AparelhoSerializer
     permission_classes = [IsAdminOrTecnico]
 

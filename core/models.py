@@ -1,15 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-#Apenas para não me esquecer
-#Usuário: admin
-#Endereço de email:
-#Password: 123
-#Password (again): 123
-#http://localhost:8000/admin
-#http://localhost:8000/api/users/
-
-
 class Loja(models.Model):
     nome = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=18, unique=True)
@@ -23,7 +14,6 @@ class Loja(models.Model):
         verbose_name = "Loja"
         verbose_name_plural = "Lojas"
         ordering = ["nome"]
-
 
 
 class User(AbstractUser):
@@ -60,7 +50,6 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
-
 
 
 class Aparelho(models.Model):
