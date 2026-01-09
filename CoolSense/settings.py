@@ -38,7 +38,36 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "core",
+    "sensors",
+    "alertas",
+    "medicoes",
 ]
+
+# ================================
+# DJANGO REST FRAMEWORK + JWT
+# ================================
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+# ================================
+# SIMPLE JWT CONFIG
+# ================================
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),   # token de acesso dura 1h
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),      # token de refresh dura 1 dia
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
 
 
 # ================================
