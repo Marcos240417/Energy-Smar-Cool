@@ -1,11 +1,16 @@
 from django.contrib import admin
-from .models import Sensor
+from .models import Sensor, Loja
 
+@admin.register(Loja)
+class LojaAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'endereco']
+    search_fields = ['nome']
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'store_id', 'is_active', 'min_temperature', 'max_temperature', 'created_at']
-    list_filter = ['is_active', 'device_type', 'created_at']
+    # Alterado 'store_id' para 'loja'
+    list_display = ['name', 'code', 'loja', 'is_active', 'min_temperature', 'max_temperature', 'created_at']
+    list_filter = ['is_active', 'loja', 'device_type', 'created_at']
     search_fields = ['name', 'code', 'description']
     readonly_fields = ['created_at', 'updated_at']
     
@@ -14,7 +19,7 @@ class SensorAdmin(admin.ModelAdmin):
             'fields': ('name', 'code', 'description')
         }),
         ('Location', {
-            'fields': ('store_id',)
+            'fields': ('loja',) # Alterado aqui também
         }),
         ('Settings', {
             'fields': ('min_temperature', 'max_temperature', 'device_type', 'ip_address')
@@ -27,4 +32,3 @@ class SensorAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-

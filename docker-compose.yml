@@ -1,41 +1,33 @@
-version: "3.8"
+version: '3.8'
 
 services:
   db_postgres:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    image: postgres:13
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  mongo:
-    image: mongo:6
-    restart: always
-    volumes:
-      - mongo_data:/data/db
-    ports:
-      - "27017:27017"
-
-  web:
-    build: .
-    command: >
-      sh -c "/wait_for_db.sh &&
-             python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db_postgres
-      - mongo
+      - postgres_data:/var/lib/postgresql/data/
     env_file:
       - .env
 
+  db_mongodb:
+    image: mongo:4.4
+    volumes:
+      - mongodb_data:/data/db
+    env_file:
+      - .env
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db_postgres
+      - db_mongodb
+
 volumes:
   postgres_data:
-  mongo_data:
+  mongodb_data:

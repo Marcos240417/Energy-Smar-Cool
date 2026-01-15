@@ -1,10 +1,17 @@
 from rest_framework import serializers
-from .models import Sensor
+from .models import Sensor, Loja
 
+class LojaSerializer(serializers.ModelSerializer):
+    """
+    Serializer para o modelo Loja.
+    """
+    class Meta:
+        model = Loja
+        fields = '__all__'
 
 class SensorSerializer(serializers.ModelSerializer):
     """
-    Serializer for Sensor model.
+    Serializer para o modelo Sensor atualizado com Loja.
     """
     status_display = serializers.ReadOnlyField()
     
@@ -15,7 +22,7 @@ class SensorSerializer(serializers.ModelSerializer):
             'name',
             'code',
             'description',
-            'store_id',
+            'loja', # Alterado de store_id para loja
             'min_temperature',
             'max_temperature',
             'is_active',
@@ -28,7 +35,6 @@ class SensorSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
     
     def validate_code(self, value):
-        
         if self.instance and self.instance.code == value:
             return value
         
@@ -37,20 +43,21 @@ class SensorSerializer(serializers.ModelSerializer):
         return value
     
     def validate(self, data):
-       
-        temp_min = data.get('min_temperature', self.instance.min_temperature if self.instance else None)
-        temp_max = data.get('max_temperature', self.instance.max_temperature if self.instance else None)
+        # Busca os valores nos dados enviados ou no objeto existente se for um update
+        temp_min = data.get('min_temperature', self.instance.min_temperature if self.instance else -10.0)
+        temp_max = data.get('max_temperature', self.instance.max_temperature if self.instance else 10.0)
         
-        if temp_min and temp_max and temp_min >= temp_max:
+        if temp_min is not None and temp_max is not None and temp_min >= temp_max:
             raise serializers.ValidationError({
                 'min_temperature': 'Minimum temperature must be less than maximum temperature.'
             })
         
         return data
 
-
 class SensorListSerializer(serializers.ModelSerializer):
-  
+    """
+    Serializer simplificado para listagem.
+    """
     status_display = serializers.ReadOnlyField()
     
     class Meta:
@@ -59,10 +66,8 @@ class SensorListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'code',
-            'store_id',
+            'loja', # Alterado de store_id para loja
             'is_active',
             'status_display',
             'created_at',
         ]
-
-
