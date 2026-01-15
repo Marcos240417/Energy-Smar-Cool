@@ -4,6 +4,7 @@ Django settings for CoolSense project.
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # ================================
 # BASE DIR
@@ -35,39 +36,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "rest_framework",
+    "rest_framework.authtoken",
     "core",
     "sensors",
     "alertas",
     "medicoes",
 ]
 
-# ================================
-# DJANGO REST FRAMEWORK + JWT
-# ================================
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
-}
-
-# ================================
-# SIMPLE JWT CONFIG
-# ================================
-from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),   # token de acesso dura 1h
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),      # token de refresh dura 1 dia
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
 
 
 # ================================
@@ -187,6 +171,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ================================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (

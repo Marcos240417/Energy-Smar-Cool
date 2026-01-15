@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission
 
 from .models import Loja, Aparelho
 from .serializers import AparelhoSerializer
-from .permissions import IsAdminOrTecnico
+from .permissions import IsAdminOrTecnico, IsAdminOrTecnicoOrReadOnlyForCliente
 from rest_framework.serializers import ModelSerializer
 
 
@@ -81,7 +81,9 @@ class LojaViewSet(ModelViewSet):
             return Loja.objects.all()
 
         if user.role == "TECNICO":
-            return Loja.objects.filter(ativa=True)
+            if getattr(user, "tecnico_autorizado", False) and user.loja_id:
+                return Loja.objects.filter(id=user.loja_id)
+            return Loja.objects.none()
 
         if user.role == "CLIENTE":
             return Loja.objects.filter(id=user.loja_id)
@@ -108,12 +110,56 @@ class AparelhoViewSet(ModelViewSet):
 
     queryset = Aparelho.objects.all()
     serializer_class = AparelhoSerializer
-    permission_classes = [IsAdminOrTecnico]
+    permission_classes = [IsAdminOrTecnicoOrReadOnlyForCliente]
 
     def get_queryset(self):
         user = self.request.user
 
-        if user.role in ["ADMIN", "TECNICO"]:
+        # Admin sees everything
+        if user.role == "ADMIN":
             return Aparelho.objects.all()
 
-        return Aparelho.objects.filter(loja=user.loja)
+        # Tecnico sees devices belonging to their loja if authorized
+        if user.role == "TECNICO":
+            if getattr(user, "tecnico_autorizado", False) and user.loja_id:
+                return Aparelho.objects.filter(loja_id=user.loja_id)
+            return Aparelho.objects.none()
+
+        # Cliente sees devices for their loja only
+        if user.role == "CLIENTE" and user.loja_id:
+            return Aparelho.objects.filter(loja_id=user.loja_id)
+
+        return Aparelho.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        # Admin can create for any loja
+        if user.role == "ADMIN":
+            return serializer.save()
+
+        # Tecnico can create only for their loja
+        if user.role == "TECNICO" and getattr(user, "tecnico_autorizado", False) and user.loja_id:
+            return serializer.save(loja_id=user.loja_id)
+
+        # Cliente cannot create
+        from rest_framework.exceptions import PermissionDenied
+        raise PermissionDenied("Você não tem permissão para criar aparelhos.")
+
+    def perform_update(self, serializer):
+        user = self.request.user
+        # Admin can update
+        if user.role == "ADMIN":
+            return serializer.save()
+
+        # Tecnico can update only devices in their loja
+        if user.role == "TECNICO" and getattr(user, "tecnico_autorizado", False) and user.loja_id:
+            instancia = serializer.instance
+            if instancia.loja_id != user.loja_id:
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("Você não pode modificar aparelho de outra loja.")
+            return serializer.save()
+
+        # Cliente cannot update
+        from rest_framework.exceptions import PermissionDenied
+        raise PermissionDenied("Você não tem permissão para editar aparelhos.")
