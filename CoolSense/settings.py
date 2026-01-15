@@ -4,6 +4,7 @@ Django settings for CoolSense project.
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # ================================
 # BASE DIR
@@ -36,8 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_filters",
-
     "rest_framework",
+    "rest_framework.authtoken",
     "core",
     "sensors",
     "alertas",
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
@@ -64,13 +66,12 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),   # token de acesso dura 1h
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),      # token de refresh dura 1 dia
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
 
 
 # ================================
@@ -185,15 +186,3 @@ STATIC_URL = "/static/"
 # ================================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-# ================================
-# DJANGO REST FRAMEWORK (BÁSICO)
-# ================================
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
-}
