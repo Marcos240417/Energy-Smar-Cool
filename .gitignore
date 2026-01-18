@@ -1,0 +1,29 @@
+# Ambientes Virtuais
+venv/
+env/
+.venv/
+
+# Banco de Dados Local (Dados de teste)
+db.sqlite3
+*.db
+
+# Arquivos Sensíveis (Segurança)
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Docker Logs e Cache
+.docker/
+*.log
+
+# Pasta do VS Code ou outros editores
+.vscode/
+.idea/
+
+# Arquivos de Sistema
+.DS_Store
+Thumbs.db
