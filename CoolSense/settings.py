@@ -6,11 +6,11 @@ from celery.schedules import crontab
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================================
-# SECURITY (Use Variáveis de Ambiente em Produção)
+# SECURITY
 # ================================
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-key")
 DEBUG = os.environ.get("DEBUG", "1") == "1"
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web", "0.0.0.0"]
 
 # ================================
 # APPLICATIONS
@@ -23,14 +23,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Bibliotecas de Terceiros
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
-    "corsheaders",  # ADICIONADO: Necessário para comunicação com App/Web
+    "corsheaders",
 
-    # Seus Apps
     "core",
     "sensors",
     "alertas",
@@ -42,7 +40,7 @@ INSTALLED_APPS = [
 # ================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware", # DEVE vir antes do CommonMiddleware
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -51,7 +49,25 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True # Para desenvolvimento. Em produção, especifique as URLs.
+# RESOLVE O ERRO (admin.E403)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+WSGI_APPLICATION = 'CoolSense.wsgi.application'
 
 # ================================
 # DATABASE (POSTGRES)
@@ -84,40 +100,21 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-SPECTACULAR_SETTINGS = {
-    "TITLE": "CoolSense API",
-    "DESCRIPTION": "Monitoramento IoT de refrigeradores e máquinas compatíveis.",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-}
-
 # ================================
-# CELERY & REDIS
+# CELERY & REDIS (Ajustado para Docker)
 # ================================
-CELERY_BROKER_URL = 'redis://localhost:6380/0' if os.name == 'nt' else 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_TIMEZONE = "America/Recife"
 
-CELERY_BEAT_SCHEDULE = {
-    'verificar-sensores-offline-cada-5-min': {
-        'task': 'medicoes.tasks.verificar_aparelhos_offline',
-        'schedule': crontab(minute='*/5'),
-    },
-}
-
 # ================================
-# EMAIL CONFIG
+# STATIC & AUTH
 # ================================
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'marcosrbterto@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "marcos2404") # Use env var!
-
-# Restante das configs (I18N, STATIC, etc) permanecem as mesmas.
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 AUTH_USER_MODEL = "core.User"
 ROOT_URLCONF = "CoolSense.urls"
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Recife"
 USE_TZ = True
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
