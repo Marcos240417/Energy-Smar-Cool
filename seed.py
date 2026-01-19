@@ -12,7 +12,6 @@ User = get_user_model()
 def run_seed():
     print("--- Iniciando Seed do Banco de Dados ---")
 
-    # 1. Criar Lojas com CNPJs fictícios para evitar erro de IntegrityError
     loja1, _ = Loja.objects.get_or_create(
         cnpj="12345678000101",
         defaults={"nome": "Mercado Central", "ativa": True}
@@ -23,7 +22,6 @@ def run_seed():
     )
     print("✅ Lojas criadas (ou já existentes).")
 
-    # 2. Criar Usuários
     users_data = [
         {"username": "admin_master", "role": "ADMIN", "email": "admin@coolsense.com"},
         {"username": "tecnico_joao", "role": "TECNICO", "email": "joao@tech.com"},

@@ -8,7 +8,7 @@ class Alerta(models.Model):
         ('critical', 'Crítico'),
     ]
 
-    # Relacionamento crucial para as estatísticas funcionarem
+
     aparelho = models.ForeignKey(
         'core.Aparelho',
         on_delete=models.CASCADE,

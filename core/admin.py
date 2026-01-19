@@ -34,8 +34,6 @@ class UserAdmin(DjangoUserAdmin):
     list_filter = ("role", "is_active", "tecnico_autorizado")
 
 
-
-
 @admin.register(Aparelho)
 class AparelhoAdmin(admin.ModelAdmin):
     list_display = ("id", "nome", "tipo", "loja", "ativo")

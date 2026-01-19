@@ -64,18 +64,16 @@ class Aparelho(models.Model):
         help_text="Endereço MAC do hardware (Ex: AA:BB:CC:11:22:33)"
     )
 
-    # --- Validação de Limites ---
     temp_min = models.FloatField(default=2.0, help_text="Temperatura mínima aceitável")
     temp_max = models.FloatField(default=8.0, help_text="Temperatura máxima aceitável")
 
-    # --- Monitoramento de Conectividade ---
     ultima_comunicacao = models.DateTimeField(null=True, blank=True, help_text="Último sinal recebido do ESP32")
 
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def status_conexao(self):
-        """Retorna se o dispositivo está online com base nos últimos 10 minutos."""
+
         if not self.ultima_comunicacao:
             return "OFFLINE"
 

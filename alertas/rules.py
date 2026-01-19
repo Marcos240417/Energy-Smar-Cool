@@ -1,9 +1,7 @@
 from alertas.models import Alerta
 
 def verificar_limites_temperatura(sensor, temperatura):
-    """
-    Compara a temperatura com os limites do sensor e gera alertas.
-    """
+
     if temperatura > sensor.max_temperature:
         return Alerta.objects.create(
             titulo=f"Temperatura Alta: {sensor.name}",

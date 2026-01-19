@@ -19,7 +19,6 @@ from alertas.models import Alerta
 from medicoes.models import Medicao
 
 
-# --- Classes de Permissão ---
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
@@ -45,7 +44,6 @@ class IsCliente(BasePermission):
         )
 
 
-# --- Serializadores ---
 
 User = get_user_model()
 
@@ -64,8 +62,6 @@ class LojaSerializer(ModelSerializer):
         model = Loja
         fields = "__all__"
 
-
-# --- ViewSets ---
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
@@ -96,11 +92,11 @@ class LojaViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def dashboard(self, request, pk=None):
-        """Resumo rápido do status da loja em tempo real via relacionamento."""
+
         loja = self.get_object()
         aparelhos = Aparelho.objects.filter(loja=loja)
 
-        # Correção: Filtra alertas ativos vinculados aos aparelhos desta loja
+
         alertas_ativos = Alerta.objects.filter(
             aparelho__loja=loja,
             ativo=True
@@ -115,11 +111,11 @@ class LojaViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def estatisticas(self, request, pk=None):
-        """Ranking de aparelhos com mais problemas nos últimos 30 dias via relacionamento."""
+
         loja = self.get_object()
         há_30_dias = timezone.now() - timedelta(days=30)
 
-        # Correção: Busca via ForeignKey (Alerta -> Aparelho -> Loja)
+
         ranking = Alerta.objects.filter(
             aparelho__loja=loja,
             criado_em__gte=há_30_dias

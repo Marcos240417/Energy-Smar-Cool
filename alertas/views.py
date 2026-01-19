@@ -6,18 +6,12 @@ from .serializers import AlertaSerializer
 
 
 class AlertaViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para gerenciar alertas.
-    Permite a listagem, filtragem e resolução de problemas com auditoria.
-    """
+
     queryset = Alerta.objects.all().order_by('-criado_em')
     serializer_class = AlertaSerializer
 
     def get_queryset(self):
-        """
-        Permite filtrar alertas por status (ativo=true/false) via query params.
-        Exemplo: /api/alertas/?ativo=true
-        """
+
         queryset = super().get_queryset()
         ativo = self.request.query_params.get('ativo', None)
         if ativo is not None:
@@ -26,10 +20,7 @@ class AlertaViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def resolver(self, request, pk=None):
-        """
-        Endpoint: POST /api/alertas/{id}/resolver/
-        Marca o alerta como inativo e registra o log de auditoria com o usuário logado.
-        """
+
         alerta = self.get_object()
 
         if not alerta.ativo:
@@ -40,16 +31,16 @@ class AlertaViewSet(viewsets.ModelViewSet):
 
         comentario = request.data.get('comentario', 'Resolvido pelo usuário via sistema.')
 
-        # 1. Atualiza o status do alerta
+
         alerta.ativo = False
-        # Mantemos o histórico na mensagem para visualização rápida
+
         alerta.mensagem += f"\n\n--- RESOLUÇÃO ---\n{comentario}"
         alerta.save()
 
-        # 2. Cria o Log de Auditoria detalhado
+
         AlertaLog.objects.create(
             alerta=alerta,
-            usuario=request.user,  # Captura o usuário do Token JWT no Postman
+            usuario=request.user,
             observacao=comentario
         )
 
@@ -65,10 +56,7 @@ class AlertaViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def historico(self, request, pk=None):
-        """
-        Endpoint: GET /api/alertas/{id}/historico/
-        Retorna a linha do tempo de quem interagiu com este alerta.
-        """
+
         alerta = self.get_object()
         logs = alerta.logs.all().values(
             'usuario__username',

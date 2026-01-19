@@ -3,9 +3,7 @@ from .models import Sensor
 
 
 class SensorSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Sensor model.
-    """
+
     status_display = serializers.ReadOnlyField()
     
     class Meta:

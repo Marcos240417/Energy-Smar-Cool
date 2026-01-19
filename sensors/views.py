@@ -45,7 +45,7 @@ class SensorViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def activate(self, request, code=None):
-        """Activates a sensor"""
+
         sensor = self.get_object()
         sensor.is_active = True
         sensor.save()
@@ -54,7 +54,7 @@ class SensorViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def deactivate(self, request, code=None):
-        """Deactivates a sensor"""
+
         sensor = self.get_object()
         sensor.is_active = False
         sensor.save()
