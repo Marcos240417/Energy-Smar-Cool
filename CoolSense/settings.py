@@ -1,16 +1,22 @@
 from pathlib import Path
 import os
+import dj_database_url
 from datetime import timedelta
-from celery.schedules import crontab
 
+# Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================================
-# SECURITY
+# SECURITY (Ajustado para Render)
 # ================================
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-key")
-DEBUG = os.environ.get("DEBUG", "1") == "1"
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web", "0.0.0.0"]
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-chave-temporaria")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+# Permite localhost e o domínio do Render
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "energy-smar-cool.onrender.com"]
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ================================
 # APPLICATIONS
@@ -27,20 +33,21 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
-    "corsheaders",
+    "corsheaders",  # Gerencia acesso do frontend externo
 
     "core",
-    "sensors",
+    "sensors",      # Monitoramento térmico
     "alertas",
     "medicoes",
 ]
 
 # ================================
-# MIDDLEWARE
+# MIDDLEWARE (Incluindo WhiteNoise e CORS)
 # ================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware", # Servir estáticos no Render
+    "corsheaders.middleware.CorsMiddleware",       # Libera acesso à API
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -49,7 +56,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# RESOLVE O ERRO (admin.E403)
+# Libera o acesso para que o outro desenvolvedor conecte o frontend dele
+CORS_ALLOW_ALL_ORIGINS = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -66,25 +75,20 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
 WSGI_APPLICATION = 'CoolSense.wsgi.application'
 
 # ================================
-# DATABASE (POSTGRES)
+# DATABASE (Render PostgreSQL)
 # ================================
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "mydb"),
-        "USER": os.environ.get("POSTGRES_USER", "myuser"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "mypassword"),
-        "HOST": os.environ.get("POSTGRES_HOST", "db_postgres"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600
+    )
 }
 
 # ================================
-# REST FRAMEWORK & SWAGGER
+# REST FRAMEWORK & AUTH
 # ================================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -94,24 +98,19 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
-    "DEFAULT_FILTER_BACKENDS": (
-        "django_filters.rest_framework.DjangoFilterBackend",
-    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # ================================
-# CELERY & REDIS (Ajustado para Docker)
-# ================================
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_TIMEZONE = "America/Recife"
-
-# ================================
-# STATIC & AUTH
+# STATIC FILES & CELERY
 # ================================
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+
 AUTH_USER_MODEL = "core.User"
 ROOT_URLCONF = "CoolSense.urls"
 LANGUAGE_CODE = "pt-br"
