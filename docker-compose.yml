@@ -26,9 +26,8 @@ services:
   web:
     build: .
     command: >
-      sh -c "/wait_for_db.sh &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+        sh -c "/wait_for_db.sh &&
+           gunicorn CoolSense.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - ./:/app
     ports:
