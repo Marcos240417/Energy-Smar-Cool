@@ -83,11 +83,17 @@ WSGI_APPLICATION = "CoolSense.wsgi.application"
 # ================================
 # BANCO DE DADOS
 # ================================
+# settings.py
+
+# Verifica se existe uma DATABASE_URL (Ambiente de Produção/Railway)
+# settings.py
 DATABASES = {
-    "default": dj_database_url.parse(
-        os.environ.get("DATABASE_URL",
-                       f"sqlite:///{BASE_DIR}/db.sqlite3"),
-        conn_max_age=600, ssl_require=True )
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        # O SSL é necessário para conexões externas, mas opcional internamente
+        ssl_require=not DEBUG
+    )
 }
 
 # ================================
