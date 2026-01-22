@@ -78,12 +78,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'CoolSense.wsgi.application'
 
 # ================================
-# DATABASE (Render PostgreSQL)
+# DATABASE (Railway PostgreSQL)
 # ================================
+# Apenas se o erro persistir após ajustar a variável no Railway
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600
+        conn_max_age=600,
+        engine='django.db.backends.postgresql' # Isso força o Django a usar o Postgres
     )
 }
 
